@@ -25,9 +25,7 @@ from jax._src.scipy.special import gammaln, xlogy
 def logpmf(x, n, p):
   """JAX implementation of scipy.stats.multinomial.logpmf."""
   x, p = _promote_args_inexact("multinomial.logpmf", x, p)
-  one = _lax_const(x, 1)
-  nplusone, xplusone = jnp.add(n, one), jnp.add(x, one)
-  logprobs = gammaln(nplusone) + jnp.sum(xlogy(x, p) - gammaln(xplusone), axis=-1)
+  logprobs = gammaln(n + 1) + jnp.sum(xlogy(x, p) - gammaln(x + 1), axis=-1)
   return jnp.where(jnp.equal(jnp.sum(x), n), logprobs, -jnp.inf)
 
 @_wraps(osp_stats.multinomial.pmf, update_doc=False)
