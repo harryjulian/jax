@@ -569,14 +569,14 @@ class LaxBackedScipyStatsTests(jtu.JaxTestCase):
        "dtype": dtype,
        "shape": shape}
       for shape in [(2,), (3,), (4,), (5,), (6,), (7,), (1,2), (1, 3), (1,4), (1,5)]
-      for dtype in itertools.combinations_with_replacement(jtu.dtypes.integer, 2)))
+      for dtype in itertools.combinations_with_replacement(jtu.dtypes.floating, 2)))
   def testMultinomialLogPmf(self, shape, dtype):
     rng = jtu.rand_positive(self.rng())
     scipy_fun = osp_stats.multinomial.logpmf
     lax_fun = lsp_stats.multinomial.logpmf
 
     def args_maker():
-      x = rng(shape, dtype[0])
+      x = np.rint(rng(shape, dtype[0]))
       n = np.sum(x)
       p = rng(shape, dtype[1])
       # Normalize the array such that it sums it's entries sum to 1 (or close enough to)

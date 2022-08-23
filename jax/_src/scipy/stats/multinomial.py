@@ -15,7 +15,6 @@
 
 import scipy.stats as osp_stats
 from jax import lax
-from jax._src.lax.lax import _const as _lax_const
 from jax._src.numpy import lax_numpy as jnp
 from jax._src.numpy.lax_numpy import _promote_args_inexact
 from jax._src.numpy.util import _wraps
@@ -32,4 +31,4 @@ def logpmf(x, n, p):
 def pmf(x, n, p):
   """JAX implementation of scipy.stats.multinomial.pmf."""
   x, p = _promote_args_inexact("multinomial.pmf", x, p)
-  return jnp.exp(logpmf(x, n, p))
+  return lax.exp(logpmf(x, n, p))
