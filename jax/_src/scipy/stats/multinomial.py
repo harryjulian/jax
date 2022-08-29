@@ -16,14 +16,14 @@
 import scipy.stats as osp_stats
 from jax import lax
 from jax._src.numpy import lax_numpy as jnp
-from jax._src.numpy.lax_numpy import _promote_args_inexact
-from jax._src.numpy.util import _wraps
+from jax._src.numpy.util import _wraps, _promote_args_inexact
 from jax._src.scipy.special import gammaln, xlogy
 
 @_wraps(osp_stats.multinomial.logpmf, update_doc=False)
 def logpmf(x, n, p):
   """JAX implementation of scipy.stats.multinomial.logpmf."""
-  x, p = _promote_args_inexact("multinomial.logpmf", x, p)
+  x = jnp.array(x.astype(int))
+  p = _promote_args_inexact("multinomial.logpmf", p)[0]
   logprobs = gammaln(n + 1) + jnp.sum(xlogy(x, p) - gammaln(x + 1), axis=-1)
   return jnp.where(jnp.equal(jnp.sum(x), n), logprobs, -jnp.inf)
 
