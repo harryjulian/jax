@@ -742,3 +742,54 @@ def sytrd_mhlo(dtype, a, *, lower):
       operand_output_aliases={5: 0},
   )
   return out[:5]
+
+# ?hetrf: Computes the Bunch-Kaufman factorization of a complex Hermitian matrix.
+def hetrh_mhlo(dtype, a):
+  _initialize()
+  a_type = ir.RankedTensorType(a.type)
+  dims = a_type.shape
+  assert len(dims) >= 2
+  m, n = dims[-2:]
+  assert m == n, (m, n)
+  batch_dims = tuple(dims[:-2])
+  num_bd = len(batch_dims)
+  b = 1
+  for d in batch_dims:
+    b *= d
+  layout = (num_bd, num_bd + 1) + tuple(range(num_bd - 1, -1, -1))
+
+  if dtype == np.complex64:
+    fn = b"lapack_chetrf"
+    lwork = _lapack.lapack_chetrd_workspace(n, n)
+    diag_type = ir.F32Type.get()
+  elif dtype == np.complex128:
+    fn = b"lapack_zhetrf"
+    lwork = _lapack.lapack_zhetrd_workspace(n, n)
+    diag_type = ir.F64Type.get()
+  else:
+    raise NotImplementedError(f"Unsupported dtype {dtype}")
+
+  out = custom_call(
+      fn,
+      [
+        # a.type,
+        # ir.RankedTensorType.get(batch_dims + (n,), diag_type), ### CHANGE TO RESPECTIVE ARGUMENTS
+        # ir.RankedTensorType.get(batch_dims + (n - 1,), diag_type),
+        # ir.RankedTensorType.get(batch_dims + (n - 1,), a_type.element_type),
+        # ir.RankedTensorType.get(batch_dims, i32_type),
+        # ir.RankedTensorType.get([lwork], a_type.element_type),
+      ],
+      [_mhlo_s32(n), _mhlo_s32(1 if lower else 0), _mhlo_s32(max(1, n)),
+       _mhlo_s32(b), _mhlo_s32(lwork), a],
+      operand_layouts=[[]] * 5 + [layout],
+      result_layouts=[
+        layout,
+        (num_bd,) + tuple(range(num_bd - 1, -1, -1)),
+        (num_bd,) + tuple(range(num_bd - 1, -1, -1)),
+        (num_bd,) + tuple(range(num_bd - 1, -1, -1)),
+        tuple(range(num_bd - 1, -1, -1)),
+        [0],
+      ],
+      operand_output_aliases={5: 0},
+  )
+  return out[:1] # which i assume is a 
