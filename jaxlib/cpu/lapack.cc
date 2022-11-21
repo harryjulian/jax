@@ -221,6 +221,11 @@ py::dict Registrations() {
   dict["lapack_zhetrd"] =
       EncapsulateFunction(Sytrd<std::complex<double>>::Kernel);
 
+  dict["lapack_chetrf"] =
+      EncapsulateFunction(Hetrf<std::complex<float>>::Kernel);
+  dict["lapack_zhetrf"] =
+      EncapsulateFunction(Hetrf<std::complex<double>>::Kernel);
+
   return dict;
 }
 
@@ -255,6 +260,8 @@ PYBIND11_MODULE(_lapack, m) {
   m.def("lapack_dsytrd_workspace", &Sytrd<double>::Workspace);
   m.def("lapack_chetrd_workspace", &Sytrd<std::complex<float>>::Workspace);
   m.def("lapack_zhetrd_workspace", &Sytrd<std::complex<double>>::Workspace);
+  m.def("lapack_chetrf_workspace", &Hetrf<std::complex<float>>::Workspace);
+  m.def("lapack_zhetrf_workspace", &Hetrf<std::complex<double>>::Workspace);
 }
 
 }  // namespace

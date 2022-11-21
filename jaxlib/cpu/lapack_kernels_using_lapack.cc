@@ -75,6 +75,8 @@ jax::Sytrd<float>::FnType ssytrd_;
 jax::Sytrd<double>::FnType dsytrd_;
 jax::Sytrd<std::complex<float>>::FnType chetrd_;
 jax::Sytrd<std::complex<double>>::FnType zhetrd_;
+jax::Hetrf<std::complex<float>>::FnType chetrf_;
+jax::Hetrf<std::complex<double>>::FnType zhetrf_;
 
 }  // extern "C"
 
@@ -125,6 +127,8 @@ static auto init = []() -> int {
   Sytrd<double>::fn = dsytrd_;
   Sytrd<std::complex<float>>::fn = chetrd_;
   Sytrd<std::complex<double>>::fn = zhetrd_;
+  Hetrf<std::complex<float>>::fn = chetrf_;
+  Hetrf<std::complex<double>>::fn = zhetrf_;
 
   return 0;
 }();

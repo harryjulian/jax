@@ -882,4 +882,41 @@ template struct Sytrd<double>;
 template struct Sytrd<std::complex<float>>;
 template struct Sytrd<std::complex<double>>;
 
+// Hetrf: 
+
+template <typename T>
+typename Hetrf<T>::FnType* Hetrf<T>::fn = nullptr;
+
+template <typename T>
+void Hetrf<T>::Kernel(void* out_tuple, void** data, XlaCustomCallStatus*) {
+  int32_t n = *reinterpret_cast<int32_t*>(data[0]);
+  T a = *reinterpret_cast<T*>(data[1]);
+  int32_t lda = *reinterpret_cast<int32_t*>(data[2]);
+  int32_t ipiv = *reinterpret_cast<int32_t*>(data[3]);
+  int32_t work = *reinterpret_cast<int32_t*>(data[4]);
+  int32_t lwork = *reinterpret_cast<int32_t*>(data[5]);
+
+  void** out = *reinterpret_cast<void**>(out_tuple);
+  T* a = *reinterpret_cast<T*>(out[0]);
+  T* work = *reinterpret_cast<T*>(out[1]);
+  int ipiv = *reinterpret_cast<int*>(out[2]);
+  int info = *reinterpret_cast<int*>(out[3]);
+
+  // Finish this off
+
+
+}
+
+template <typename T>
+int64_t Hetrf<T>::Workspace(lapack_int* lwork, lapack_int* info) {
+  char uplo = 'L';
+  lapack_int lwork = -1;
+  lapack_int info = 0;
+  fn(&uplo, &n, &a, &lda, &ipiv, &work, &lwork, &info);
+  return info == 0 ? static_cast<int64_t>(std::real(work)) : -1
+}
+
+template struct Hetrf<std::complex<float>>;
+template struct Hetrf<std::complex<double>>;
+
 }  // namespace jax
