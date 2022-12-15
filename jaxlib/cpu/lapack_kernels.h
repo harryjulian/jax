@@ -217,16 +217,15 @@ struct Sytrd {
 
 template <typename T>
 struct Hetrf {
-  using FnType = void(char* uplo, lapack_int* n, real_type<T>::type* a, 
-                      lapack_int* lda, lapack_int* ipiv, 
-                      lapack_int* work, lapack_int* lwork);
+  using FnType = void(char* uplo, lapack_int* n, T* a, lapack_int* lda, 
+                      T* work, lapack_int* lwork, lapack_int* info);
 
   static FnType* fn;
   static void Kernel(void* out, void** data, XlaCustomCallStatus*);
 
-  static int64_t Workspace(lapack_int* lwork, lapack_int* work);
-}
+  static int64_t Workspace(lapack_int lda, lapack_int n);
+};
 
-}  // namespace jax
+} // namespace jax
 
 #endif  // JAXLIB_CPU_LAPACK_KERNELS_H_

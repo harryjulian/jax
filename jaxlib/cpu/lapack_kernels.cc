@@ -908,11 +908,12 @@ void Hetrf<T>::Kernel(void* out_tuple, void** data, XlaCustomCallStatus*) {
 }
 
 template <typename T>
-int64_t Hetrf<T>::Workspace(lapack_int* lwork, lapack_int* info) {
+int64_t Hetrf<T>::Workspace(lapack_int lda, lapack_int n) {
   char uplo = 'L';
+  T work = 0;
   lapack_int lwork = -1;
   lapack_int info = 0;
-  fn(&uplo, &n, &a, &lda, &ipiv, &work, &lwork, &info);
+  fn(&uplo, &n, nullptr, &lda, &work, &lwork, &info);
   return info == 0 ? static_cast<int64_t>(std::real(work)) : -1
 }
 
